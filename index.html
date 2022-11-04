@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <canvas id="test" />
+    <script>
+      const c = document.getElementById('test')
+      const size = [1000, 1000]
+      c.width = size[0]
+      c.height = size[1]
+      const ctx = c.getContext('2d')
+      const baseHeight = 100,
+        letterWidth = 30
+
+      const weights = Array.from(
+        { length: 26 },
+        () => (Math.floor(Math.random() * (10 - 4 + 1)) + 4) / 10
+      )
+      const placedWords = []
+
+      ctx.fillStyle = 'red'
+      ctx.fillRect(Math.floor(size[0] / 2), Math.floor(size[1] / 2), 10, 10)
+
+      for (let weight of weights) {
+        const word = {
+          x: Math.floor(size[0] / 2),
+          y: Math.floor(size[1] / 2),
+          height: Math.floor(baseHeight * weight),
+          width: (Math.floor(Math.random() * (10 - 4 + 1)) + 4) * letterWidth,
+        }
+
+        placeWord(word)
+      }
+
+      ctx.strokeStyle = 'black'
+      ctx.lineWidth = 1
+      placedWords.forEach((word) => {
+        ctx.strokeRect(
+          word.x - word.width / 2,
+          word.y - word.height / 2,
+          word.width,
+          word.height
+        )
+      })
+
+      function placeWord(word) {
+        const s = archimedeanSpiral(size),
+          startX = word.x,
+          startY = word.y
+        let dt = Math.random() < 0.5 ? 1 : -1,
+          t = -dt
+
+        while ((dxdy = s((t += dt)))) {
+          word.x = startX + ~~dxdy[0]
+          word.y = startY + ~~dxdy[1]
+          if (canPlace(word)) {
+            placedWords.push(word)
+            break
+          }
+        }
+      }
+
+      function archimedeanSpiral(size) {
+        var e = size[0] / size[1]
+        return function (t) {
+          return [e * (t *= 0.1) * Math.cos(t), t * Math.sin(t)]
+        }
+      }
+      function canPlace(word) {
+        for (let i = 0; i < placedWords.length; i++) {
+          const placedWord = placedWords[i]
+          if (isOverLap(word, placedWord)) {
+            return false
+          }
+        }
+        return true
+      }
+
+      // 以 x,y 为中心的矩形
+      function isOverLap(wordA, wordB) {
+        const ALeft = wordA.x - wordA.width / 2,
+          ARight = wordA.x + wordA.width / 2,
+          ATop = wordA.y - wordA.height / 2,
+          ABottom = wordA.y + wordA.height / 2
+
+        const BLeft = wordB.x - wordB.width / 2,
+          BRight = wordB.x + wordB.width / 2,
+          BTop = wordB.y - wordB.height / 2,
+          BBottom = wordB.y + wordB.height / 2
+
+        return !(
+          ALeft > BRight ||
+          ATop > BBottom ||
+          BLeft > ARight ||
+          BTop > ABottom
+        )
+      }
+    </script>
+  </body>
+</html>
