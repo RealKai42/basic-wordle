@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>basic wordle</title>
   </head>
   <body>
     <canvas id="test" />
@@ -66,7 +66,7 @@
       }
 
       function archimedeanSpiral(size) {
-        var e = size[0] / size[1]
+        const e = size[0] / size[1]
         return function (t) {
           return [e * (t *= 0.1) * Math.cos(t), t * Math.sin(t)]
         }
